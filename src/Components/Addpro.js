@@ -1,50 +1,106 @@
-import React,{useContext, useState} from "react";
-import { prodContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom"; 
+import {useFormik} from 'formik';
 import axios from "axios";
+import * as Yup from 'yup';
 
 export function Addpro(){
 
-    let context = useContext(prodContext);
+
     let navigate = useNavigate()
 
-  async  function saveHandeler(){
-       let respon = await axios.post('https://614eacb5b4f6d30017b4833b.mockapi.io/products',{
-           name,
-           price,
-           model,
-           units
-       })
+
+    const formik = useFormik({
+        initialValues: {
+          name: '',
+          price: '',
+          model: '',
+          units:''
+        },
+        validationSchema: Yup.object({
+            name:Yup.string().required('Enter the Product name *'),
+            price:Yup.number().required('Enter the Product price *'),
+            model:Yup.string().required('Enter the Product model *'),
+            units:Yup.number().required('Enter No.of Units *'),
+
+
+           
+        }),
+        onSubmit: values => {
+          saveHandeler(values);
+          console.log(values);
+        },
+      });
+
+
+  async  function saveHandeler(value){
+       let respon = await axios.post('https://614eacb5b4f6d30017b4833b.mockapi.io/products',value)
        
 
         navigate('/all')
     }
     
-    let [name,setname]=useState();
-    let [price,setprice]=useState();
-    let[model,setmodel]=useState();
-    let[units,setunits]=useState();
+
 
     return(
         <div className="add-product col-8 mt-5">
             <h2 className="mb-4">Add Product</h2>
-  <div class="form-group">
-    <label for="exampleInputname">Product Name</label>
-    <input type="text" class="form-control" onChange={(e)=>setname(e.target.value)} id="exampleInputname" aria-describedby="emailHelp"/>
-    
-    <label for="exampleInputnum">Product Price</label>
-    <input type="Number"  class="form-control" onChange={(e)=>setprice(e.target.value)} id="exampleInputnum" aria-describedby="emailHelp"/>
-    
-    <label for="exampleInputdis">Product model</label>
-    <input type="text" class="form-control" onChange={(e)=>setmodel(e.target.value)} id="exampleInputdis" aria-describedby="emailHelp"/>
+ 
+    <form onSubmit={formik.handleSubmit}>
+    <label for="name">Product Name</label>
+    <input
+        id="name"
+        name="name"
+        type="text"
+        class="form-control"
+        onChange={formik.handleChange}
+        value={formik.values.name}
+    />
+    {formik.touched.name && formik.errors.name?(<div style={{color:"red"}}>{formik.errors.name}</div>):null}
+    <br></br>
+    <label for="price">Product Price</label>
+    <input
+        id="price"
+        name="price"
+        type="number"
+        class="form-control"
+        onChange={formik.handleChange}
+        value={formik.values.price}
+    />
+        {formik.touched.price && formik.errors.price?(<div style={{color:"red"}}>{formik.errors.price}</div>):null}
+        <br></br>
+        <label for="model">Product model</label>
+        <input
+        id="model"
+        name="model"
+        type="text"
+        class="form-control"
+        onChange={formik.handleChange}
+        value={formik.values.model}
+    />
+    {formik.touched.model && formik.errors.model?(<div style={{color:"red"}}>{formik.errors.model}</div>):null}
+    <br></br>
+    <label for="unit">No Units</label>
+    <input
+        id="unit"
+        name="units"
+        type="number"
+        class="form-control"
+        onChange={formik.handleChange}
+        value={formik.values.units}
+    />
+        {formik.touched.units && formik.errors.units?(<div style={{color:"red"}}>{formik.errors.units}</div>):null}
+        <br></br>
 
-    <label for="exampleInputnum">No Units</label>
-    <input type="Number"  class="form-control" onChange={(e)=>setunits(e.target.value)} id="exampleInputnum" aria-describedby="emailHelp"/>
-    
-  </div>
-
-  <button type="submit" className="btn btn-primary" onClick={saveHandeler} >Add product</button>
+        <button className="btn btn-primary" type="submit">Add product</button>
+    </form>
 
         </div>
+        
     )
 }
+
+
+
+
+
